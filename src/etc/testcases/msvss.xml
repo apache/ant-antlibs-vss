@@ -1,0 +1,227 @@
+<?xml version="1.0"?>
+
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="msvss-test" basedir="../../../"
+         default="test-all" xmlns:vss="antlib:org.apache.ant.vss">
+
+  <property name="file" value="build.xml"/>
+  <property name="vss-project" value="antlib"/>
+  <property name="testcase-dir" value="${basedir}/src/etc/testcases"/>
+  <property name="testing-dir" value="${basedir}/testing"/>
+  <property environment="env" />
+
+  <presetdef name="sscreate">
+    <vss:create
+      ssdir="${vss-ss-dir}"
+      serverPath="${vss-server-dir}"
+      login="Guest,"
+    />
+  </presetdef>
+
+  <presetdef name="sscp">
+    <vss:cp
+      ssdir="${vss-ss-dir}"
+      serverPath="${vss-server-dir}"
+      login="Guest,"
+    />
+  </presetdef>
+
+  <presetdef name="ssadd">
+    <vss:add
+      ssdir="${vss-ss-dir}"
+      serverPath="${vss-server-dir}"
+      login="Guest,"
+    />
+  </presetdef>
+
+  <macrodef name="create-tempfile">
+    <attribute name="property" />
+    <attribute name="directory" default="${testing-dir}" />
+    <attribute name="message" default="Testing VSS"/>
+    <sequential>
+      <mkdir dir="@{directory}" />
+      <tempfile property="@{property}" destdir="@{directory}"
+          suffix=".java" />
+      <echo file="${@{property}}" message="// @{message}" />
+    </sequential>
+  </macrodef>
+
+  <target name="setup" depends="find-ss-server-dir, find-ss-dir">
+    <fail unless="vss-ss-dir">Could not find ss.exe.
+        Add to Path environment variable
+        or add vss-ss-dir=[path to ss.exe] to build.properties
+        or add -Dvss-ss-dir=[path to ss.exe] to command line.</fail>
+    <fail unless="vss-server-dir">Could not find SourceSafe Database.
+        Add SSDIR to environment
+        or add vss-server-dir=[path to database] to build.properties
+        or add -Dvss-server-dir=[path to database] to command line.</fail>
+    <sscreate
+      vsspath="$/${vss-project}"
+    />
+    <sscp
+      vsspath="$/${vss-project}"
+    />
+  </target>
+
+  <target name="find-ss-server-dir" unless="vss-server-dir">
+    <available property="vss-server-dir" file="srcsafe.ini"
+        filepath="${env.SSDIR}" value="${env.SSDIR}" />
+    <available property="vss-server-dir" file="srcsafe.ini"
+        filepath="${env.Ssdir}" value="${env.Ssdir}" />
+    <available property="vss-server-dir" file="srcsafe.ini"
+        filepath="${env.ssdir}" value="${env.ssdir}" />
+  </target>
+
+  <target name="find-ss-dir" depends="find-ss-exe" if="vss-ss-exe"
+      unless="vss-ss-dir">
+    <dirname property="vss-ss-dir" file="${vss-ss-exe}" />
+  </target>
+
+  <target name="find-ss-exe" unless="vss-ss-exe">
+    <available property="vss-ss-exe" file="ss.exe" filepath="${env.Path}"
+        value="ss.exe" />
+    <available property="vss-ss-exe"
+        file="C:\Program Files\Microsoft Visual Sourcesafe\ss.exe"
+        value="C:\Program Files\Microsoft Visual Sourcesafe\ss.exe" />
+    <available property="vss-ss-exe"
+        file="C:\Program Files (x86)\Microsoft Visual Sourcesafe\ss.exe"
+        value="C:\Program Files (x86)\Microsoft Visual Sourcesafe\ss.exe"/>
+  </target>
+
+
+  <target name="test-all" depends="setup, test-delete-recover, test-add,
+      test-move, test-cloak, test-locate, test-status, test-checkout, test-checkin"
+      description="Test all VSS tasks other than destroy (use cleanup for that)"
+  />
+
+  <target name="test-add" depends="setup">
+    <create-tempfile property="vss-temp-file" message="Testing Add for VSS" />
+    <ssadd
+      vsspath="$/${vss-project}"
+      localpath="${vss-temp-file}"
+      comment="Testing Add for VSS"
+    />
+  </target>
+
+  <target name="test-move" depends="setup">
+    <!-- create sub projects -->
+    <sscreate
+      vsspath="$/${vss-project}/sub1"
+    />
+
+    <sscreate
+      vsspath="$/${vss-project}/sub2"
+    />
+
+    <!-- perform move operation -->
+    <vss:move
+      vsspath="$/${vss-project}/sub2"
+      destination="$/${vss-project}/sub1"
+      login="Guest,"
+      ssdir="${vss-ss-dir}"
+      serverPath="${vss-server-dir}"
+    />
+  </target>
+
+  <target name="test-cloak" depends="setup">
+    <vss:cloak
+      vsspath="$/${vss-project}"
+      login="Guest,"
+      ssdir="${vss-ss-dir}"
+      serverPath="${vss-server-dir}"
+    />
+    <vss:decloak
+      vsspath="$/${vss-project}"
+      login="Guest,"
+      ssdir="${vss-ss-dir}"
+      serverPath="${vss-server-dir}"
+    />
+  </target>
+
+  <target name="test-delete-recover" depends="setup">
+    <vss:delete
+      vsspath="$/${vss-project}"
+      login="Guest,"
+      ssdir="${vss-ss-dir}"
+      serverPath="${vss-server-dir}"
+    />
+    <vss:recover
+      vsspath="$/${vss-project}"
+      login="Guest,"
+      ssdir="${vss-ss-dir}"
+      serverPath="${vss-server-dir}"
+    />
+    <!-- should be able to change to project as it has been 'recovered' -->
+    <sscp
+      vsspath="$/${vss-project}"
+    />
+  </target>
+
+  <target name="test-locate" depends="setup">
+    <vss:locate
+      vsspath="$/${vss-project}"
+      login="Guest,"
+      ssdir="${vss-ss-dir}"
+      serverPath="${vss-server-dir}"
+    />
+  </target>
+
+  <target name="test-status" depends="setup">
+    <vss:status
+      vsspath="$/${vss-project}"
+      login="Guest,"
+      user="Guest"
+      ssdir="${vss-ss-dir}"
+      serverPath="${vss-server-dir}"
+    />
+  </target>
+
+  <target name="test-checkout" depends="setup, test-add">
+    <vss:checkout
+      ssdir="${vss-ss-dir}"
+      serverPath="${vss-server-dir}"
+      vsspath="$/${vss-project}"
+      localpath="${testing-dir}"
+      login="Guest,"
+    />
+  </target>
+
+  <target name="test-checkin" depends="setup, test-checkout">
+    <echo file="${vss-temp-file}" message="Testing Checkin with VSS" />
+    <vss:checkin
+      ssdir="${vss-ss-dir}"
+      serverPath="${vss-server-dir}"
+      vsspath="$/${vss-project}"
+      localpath="${testing-dir}"
+      login="Guest,"
+      comment="Testing Checkin with VSS"
+    />
+  </target>
+
+  <target name="cleanup" depends="find-ss-server-dir, find-ss-dir">
+    <vss:destroy
+      vsspath="$/${vss-project}"
+      login="Guest,"
+      autoresponse="Y"
+      ssdir="${vss-ss-dir}"
+      serverPath="${vss-server-dir}"
+    />
+    <delete dir="${testing-dir}" />
+  </target>
+</project>

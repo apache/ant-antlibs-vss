@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<antlib>
+  <taskdef
+    name="vss"
+    classname="org.apache.ant.vss.MSVSS"
+    />
+  <taskdef
+    name="add"
+    classname="org.apache.ant.vss.MSVSSADD"
+    />
+  <taskdef
+    name="checkin"
+    classname="org.apache.ant.vss.MSVSSCHECKIN"
+    />
+  <taskdef
+    name="checkout"
+    classname="org.apache.ant.vss.MSVSSCHECKOUT"
+    />
+  <taskdef
+    name="cp"
+    classname="org.apache.ant.vss.MSVSSCP"
+    />
+  <taskdef
+    name="create"
+    classname="org.apache.ant.vss.MSVSSCREATE"
+    />
+  <taskdef
+    name="get"
+    classname="org.apache.ant.vss.MSVSSGET"
+    />
+  <taskdef
+    name="history"
+    classname="org.apache.ant.vss.MSVSSHISTORY"
+    />
+  <taskdef
+    name="label"
+    classname="org.apache.ant.vss.MSVSSLABEL"
+    />
+  <taskdef
+    name="destroy"
+    classname="org.apache.ant.vss.MSVSSDESTROY"
+    />
+  <taskdef
+    name="delete"
+    classname="org.apache.ant.vss.MSVSSDELETE"
+    />
+  <taskdef
+    name="recover"
+    classname="org.apache.ant.vss.MSVSSRECOVER"
+    />
+  <taskdef
+    name="move"
+    classname="org.apache.ant.vss.MSVSSMOVE"
+    />
+  <taskdef
+    name="cloak"
+    classname="org.apache.ant.vss.MSVSSCLOAK"
+    />
+  <taskdef
+    name="decloak"
+    classname="org.apache.ant.vss.MSVSSDECLOAK"
+    />
+  <taskdef
+    name="locate"
+    classname="org.apache.ant.vss.MSVSSLOCATE"
+    />
+  <taskdef
+    name="status"
+    classname="org.apache.ant.vss.MSVSSSTATUS"
+    />
+</antlib>
