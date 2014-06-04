@@ -34,10 +34,10 @@
     <programming-language>Java</programming-language>
     <category rdf:resource="http://projects.apache.org/category/build-management" />
     <repository>
-      <SVNRepository>
-        <location rdf:resource="http://svn.apache.org/repos/asf/ant/antlibs/vss"/>
-        <browse rdf:resource="http://svn.apache.org/viewvc/ant/antlibs/vss"/>
-      </SVNRepository>
+      <GitRepository>
+        <location rdf:resource="https://git-wip-us.apache.org/repos/asf/ant-antlibs-vss.git"/>
+        <browse rdf:resource="https://git-wip-us.apache.org/repos/asf?p=ant-antlibs-vss.git"/>
+      </GitRepository>
     </repository>
   </Project>
 </rdf:RDF>
